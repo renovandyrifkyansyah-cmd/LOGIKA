@@ -1,137 +1,183 @@
+import os
+import time
+
 # ==============================================================================
-# PROGRAM UTAMA: KALKULATOR TABEL KEBENARAN LOGIKA PROPOSISI (PROSEDURAL)
+# STRUKTUR DATA SOAL KUIS (Kuis Berbasis Skenario Kehidupan Nyata)
+# ==============================================================================
+DAFTAR_SOAL = [
+    {
+        "kategori": "Implikasi (Jika P Maka Q)",
+        "cerita": "Janji Ibu: 'Jika kamu dapat nilai A pada ujian Matematika, maka Ibu akan belikan Sepatu Baru.'",
+        "pertanyaan": "Kapan janji Ibu dianggap DIINGKARI (Bernilai SALAH/False)?",
+        "pilihan": [
+            "A. Kamu dapat nilai A, dan Ibu belikan Sepatu Baru.",
+            "B. Kamu dapat nilai A, tetapi Ibu TIDAK membelikan Sepatu Baru.",
+            "C. Kamu TIDAK dapat nilai A, tetapi Ibu tetap membelikan Sepatu Baru.",
+            "D. Kamu TIDAK dapat nilai A, dan Ibu TIDAK membelikan Sepatu Baru."
+        ],
+        "kunci": "B",
+        "penjelasan": "Implikasi (P -> Q) hanya bernilai SALAH jika sebabnya terjadi (P = True), tetapi akibatnya tidak ditepati (Q = False)."
+    },
+    {
+        "kategori": "Negasi / Ingkaran",
+        "cerita": "Pernyataan: 'Semua siswa kelas 12 lulus ujian nasional.'",
+        "pertanyaan": "Apa ingkaran (negasi) yang paling tepat dari pernyataan di atas?",
+        "pilihan": [
+            "A. Semua siswa kelas 12 tidak lulus ujian nasional.",
+            "B. Tidak ada siswa kelas 12 yang lulus ujian nasional.",
+            "C. Ada setidaknya satu siswa kelas 12 yang tidak lulus ujian nasional.",
+            "D. Beberapa siswa kelas 12 lulus ujian nasional."
+        ],
+        "kunci": "C",
+        "penjelasan": "Ingkaran dari Kuantor Universal ('Semua P') adalah Kuantor Eksistensial ('Ada/Beberapa P yang Bukan'). Cukup 1 orang gagal untuk membantah kata 'Semua'."
+    },
+    {
+        "kategori": "Penarikan Kesimpulan (Modus Ponens)",
+        "cerita": "Premis 1: Jika hari hujan, maka lapangan sekolah becek.\nPremis 2: Hari ini hujan deras.",
+        "pertanyaan": "Kesimpulan yang sah (valid) adalah...",
+        "pilihan": [
+            "A. Lapangan sekolah becek.",
+            "B. Lapangan sekolah tidak becek.",
+            "C. Hari ini tidak hujan.",
+            "D. Lapangan sekolah digunakan untuk main bola."
+        ],
+        "kunci": "A",
+        "penjelasan": "Mengikuti aturan Modus Ponens: [(P -> Q) DAN P] menyimpulkan Q."
+    }
+]
+
+# ==============================================================================
+# FUNGSI PENDUKUNG MEDIA AJAR
 # ==============================================================================
 
-def cetak_header():
-    """Menampilkan judul dan informasi program."""
-    print("=" * 60)
-    print("      PROGRAM EVALUATOR LOGIKA PROPOSISI & TABEL KEBENARAN      ")
-    print("==============================================================")
-    print("Keterangan Operasi Logika:")
-    print(" 1. NOT (Negasi)       : ~P")
-    print(" 2. AND (Konjungsi)    : P AND Q")
-    print(" 3. OR  (Disjungsi)    : P OR Q")
-    print(" 4. IMPLIKASI          : P -> Q  (Jika P maka Q)")
-    print(" 5. BIIMPLIKASI        : P <-> Q (P jika dan hanya jika Q)")
-    print("=" * 60)
+def bersihkan_layar():
+    """Layar dibersihkan agar tampilan terminal rapi ala aplikasi modern."""
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
-def logika_not(p):
-    """Menghitung negasi (~P)."""
-    return not p
+def cetak_header(judul):
+    """Mencetak header visual yang menarik."""
+    print("=" * 65)
+    print(f"   {judul.upper()}")
+    print("=" * 65)
 
 
-def logika_and(p, q):
-    """Menghitung konjungsi (P AND Q)."""
-    return p and q
-
-
-def logika_or(p, q):
-    """Menghitung disjungsi (P OR Q)."""
-    return p or q
-
-
-def logika_implikasi(p, q):
-    """Menghitung implikasi (P -> Q).
-    Implikasi bernilai False HANYA JIKA P = True dan Q = False.
-    """
-    return (not p) or q
-
-
-def logika_biimplikasi(p, q):
-    """Menghitung biimplikasi (P <-> Q).
-    Biimplikasi bernilai True JIKA nilai kebenaran P dan Q SAMA.
-    """
-    return p == q
-
-
-def format_boolean(nilai):
-    """Mengubah nilai boolean True/False menjadi karakter T/F untuk konsistensi."""
-    return "T" if nilai else "F"
-
-
-def buat_tabel_kebenaran_lengkap():
-    """Menghasilkan dan menampilkan tabel kebenaran lengkap untuk P dan Q
-    terhadap seluruh operasi logika dasar.
-    """
-    print("\n[ TABEL KEBENARAN LOGIKA DASAR ]\n")
-    # Header Tabel
-    print(f"|  P  |  Q  | ~P  | P AND Q | P OR Q | P -> Q | P <-> Q |")
-    print("-" * 57)
-
-    # Kombinasi nilai kebenaran untuk 2 variabel (True/False)
-    kombinasi_p_q = [(True, True), (True, False), (False, True), (False, False)]
-
-    for p, q in kombinasi_p_q:
-        not_p = logika_not(p)
-        and_op = logika_and(p, q)
-        or_op = logika_or(p, q)
-        impl_op = logika_implikasi(p, q)
-        biimpl_op = logika_biimplikasi(p, q)
-
-        # Format setiap baris output
-        p_str = format_boolean(p)
-        q_str = format_boolean(q)
-        not_p_str = format_boolean(not_p)
-        and_str = format_boolean(and_op)
-        or_str = format_boolean(or_op)
-        impl_str = format_boolean(impl_op)
-        biimpl_str = format_boolean(biimpl_op)
-
-        print(
-            f"|  {p_str}  |  {q_str}  |  {not_p_str}  |    {and_str}    |   {or_str}    |   {impl_str}    |    {biimpl_str}    |"
-        )
-
-    print("-" * 57)
-
-
-def evaluasi_ekspresi_kustom(p, q):
-    """Mengevaluasi bentuk proposisi majemuk khusus: ((P -> Q) AND P) -> Q
-    (Bentuk argumen valid: Modus Ponens).
-    """
-    p_impl_q = logika_implikasi(p, q)
-    hipotesis = logika_and(p_impl_q, p)
-    hasil_akhir = logika_implikasi(hipotesis, q)
-    return p_impl_q, hipotesis, hasil_akhir
-
-
-def buat_tabel_modus_ponens():
-    """Menampilkan pembuktian Tautologi Modus Ponens: ((P -> Q) AND P) -> Q."""
-    print("\n[ PEMBUKTIAN TAUTOLOGI: MODUS PONENS ]")
-    print("Formula: ((P -> Q) AND P) -> Q\n")
-    print(f"|  P  |  Q  | P -> Q | (P->Q) AND P | Hasil Akhir |")
-    print("-" * 53)
-
-    kombinasi_p_q = [(True, True), (True, False), (False, True), (False, False)]
-
-    semua_true = True
-    for p, q in kombinasi_p_q:
-        p_impl_q, hipotesis, hasil = evaluasi_ekspresi_kustom(p, q)
-
-        if not hasil:
-            semua_true = False
-
-        print(
-            f"|  {format_boolean(p)}  |  {format_boolean(q)}  |   {format_boolean(p_impl_q)}    |      {format_boolean(hipotesis)}       |      {format_boolean(hasil)}      |"
-        )
-
-    print("-" * 53)
-    if semua_true:
-        print("Kesimpulan: Ekspresi tersebut adalah TAUTOLOGI (Selalu bernilai True).")
+def tampilkan_papan_skor(skor, total_soal):
+    """Menampilkan ringkasan hasil belajar siswa."""
+    bersihkan_layar()
+    cetak_header("Hasil Akhir Kuis Logika Matematika")
+    
+    persentase = (skor / total_soal) * 100
+    print(f"\nSkor Kamu : {skor} dari {total_soal} soal ({persentase:.0f}%)\n")
+    
+    if persentase == 100:
+        print("Peringkat: MASTER LOGIKA!")
+        print("Pikiranmu sangat tajam, tidak mudah terkecoh oleh janji manis maupun argumen sesat!")
+    elif persentase >= 60:
+        print("Peringkat: DETEKTIF LOGIKA!")
+        print("Kemampuan logikamu sudah bagus, tinggal sedikit melatih ketelitian.")
     else:
-        print("Kesimpulan: Ekspresi tersebut BUKAN Tautologi.")
-
-
-def jalankan_program():
-    """Fungsi utama pengendali alur eksekusi prosedural."""
-    cetak_header()
-    buat_tabel_kebenaran_lengkap()
-    buat_tabel_modus_ponens()
-    print("\nProgram selesai dieksekusi.")
+        print("Peringkat: PEMULA LOGIKA!")
+        print("Jangan berkecil hati! Logika adalah melatih pola pikir, ayo coba lagi!")
+        
+    print("\n" + "=" * 65)
 
 
 # ==============================================================================
-# TITIK MASUK PROGRAM (ENTRY POINT)
+# MODUL UTAMA APLIKASI
+# ==============================================================================
+
+def modul_simulator_tabel():
+    """Fitur eksplorasi tabel kebenaran interaktif."""
+    bersihkan_layar()
+    cetak_header("Simulator Tabel Kebenaran Interaktif")
+    
+    print("\nPilih dua nilai kebenaran untuk uji coba:")
+    print("Pernyataan P (misal: 'Hari Hujan')")
+    p_input = input("Apakah P Benar? (y/n): ").strip().lower() == 'y'
+    
+    print("\nPernyataan Q (misal: 'Lapangan Becek')")
+    q_input = input("Apakah Q Benar? (y/n): ").strip().lower() == 'y'
+    
+    p_str = "BENAR (T)" if p_input else "SALAH (F)"
+    q_str = "BENAR (T)" if q_input else "SALAH (F)"
+    
+    bersihkan_layar()
+    cetak_header("Hasil Evaluasi Logika")
+    print(f"\nStatus Input : P = {p_str} | Q = {q_str}\n")
+    
+    print(f"1. Negasi (~P)        : {'SALAH (F)' if p_input else 'BENAR (T)'}")
+    print(f"2. Konjungsi (P AND Q): {'BENAR (T)' if (p_input and q_input) else 'SALAH (F)'}")
+    print(f"3. Disjungsi (P OR Q) : {'BENAR (T)' if (p_input or q_input) else 'SALAH (F)'}")
+    
+    # Implikasi
+    implikasi = (not p_input) or q_input
+    print(f"4. Implikasi (P -> Q) : {'BENAR (T)' if implikasi else 'SALAH (F)'}")
+    
+    # Biimplikasi
+    biimplikasi = p_input == q_input
+    print(f"5. Biimplikasi (P<->Q): {'BENAR (T)' if biimplikasi else 'SALAH (F)'}")
+    
+    print("\n" + "=" * 65)
+    input("\nTekan Enter untuk kembali ke menu utama...")
+
+
+def modul_kuis_interaktif():
+    """Fitur kuis berbasis cerita untuk siswa SMA."""
+    skor = 0
+    total = len(DAFTAR_SOAL)
+    
+    for idx, soal in enumerate(DAFTAR_SOAL, start=1):
+        bersihkan_layar()
+        cetak_header(f"Soal {idx}/{total} - {soal['kategori']}")
+        
+        print(f"\n[Skenario]:\n{soal['cerita']}\n")
+        print(f"[Pertanyaan]:\n{soal['pertanyaan']}\n")
+        
+        for pil in soal["pilihan"]:
+            print(f"  {pil}")
+            
+        jawab = input("\nJawaban Kamu (A/B/C/D): ").strip().upper()
+        
+        if jawab == soal["kunci"]:
+            print("\n  JAWABAN BENAR! Bagus sekali!")
+            skor += 1
+        else:
+            print(f"\n  JAWABAN KURANG TEPAT. Jawaban yang benar adalah {soal['kunci']}.")
+            
+        print(f"\n[Penjelasan Logika]:\n{soal['penjelasan']}")
+        print("\n" + "-" * 65)
+        input("Tekan Enter untuk melanjutkan ke soal berikutnya...")
+        
+    tampilkan_papan_skor(skor, total)
+    input("\nTekan Enter untuk kembali ke menu utama...")
+
+
+def menu_utama():
+    """Menu navigasi utama media ajar."""
+    while True:
+        bersihkan_layar()
+        cetak_header("MEDIA AJAR INTERAKTIF: LOGIKA MATEMATIKA SMA")
+        print("\nSelamat Datang! Silahkan pilih modul belajar:\n")
+        print("  [1] Kuis Logika Skenario Kehidupan Nyata")
+        print("  [2] Simulator Tabel Kebenaran Interaktif")
+        print("  [3] Keluar dari Aplikasi")
+        print("\n" + "=" * 65)
+        
+        pilihan = input("\nPilih Menu (1/2/3): ").strip()
+        
+        if pilihan == '1':
+            modul_kuis_interaktif()
+        elif pilihan == '2':
+            modul_simulator_tabel()
+        elif pilihan == '3':
+            bersihkan_layar()
+            print("Terima kasih telah belajar Logika Matematika! Sampai jumpa!")
+            break
+
+
+# ==============================================================================
+# TITIK MASUK APLIKASI
 # ==============================================================================
 if __name__ == "__main__":
-    jalankan_program()
+    menu_utama()
